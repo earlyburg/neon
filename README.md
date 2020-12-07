@@ -49,7 +49,7 @@ CREDITS
 ---------------
 - This module uses the Simple HTML DOM Parser Library
   * Website: http://sourceforge.net/projects/simplehtmldom/
-- Authors: S.C. Chen, John Schlick, Rus Carroll, logmanoriginal
+  * Authors: S.C. Chen, John Schlick, Rus Carroll, logmanoriginal
 
 - [earlyburg](https://github.com/earlyburg).
 
