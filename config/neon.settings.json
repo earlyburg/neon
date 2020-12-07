@@ -3,12 +3,12 @@
   "htpasswd_uname": "Someuser",
   "htpasswd_pword": "Somepass",
   "htpasswd": 0,
-	"scrp_url": "",
-	"scrp_depth": "",
-	"scrp_spec_div": "",
-	"scrp_imgs": 0,
-	"scrp_lnks": 0,
-	"scrp_page": 0,
+  "scrp_url": "",
+  "scrp_depth": "",
+  "scrp_spec_div": "",
+  "scrp_imgs": 0,
+  "scrp_lnks": 0,
+  "scrp_page": 0,
   "csv": 0,
   "save_node": 0
 }

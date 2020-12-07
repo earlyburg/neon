@@ -1,8 +1,8 @@
 {
   "_config_name": "neon.batch.settings",
-	"scrp_save": "",
-	"scrp_imgs": 0,
-	"scrp_lnks": 0,
-	"scrp_page": 0,
+  "scrp_save": "",
+  "scrp_imgs": 0,
+  "scrp_lnks": 0,
+  "scrp_page": 0,
   "batch_run": 0
 }

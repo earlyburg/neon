@@ -2,10 +2,10 @@
 
 class NeonBatch {
 
-	function __construct() {
+  function __construct() {
     global $user;
     $this->id = $user->uid;
-	}
+  }
 
 
   public function check() {

@@ -17,9 +17,9 @@ HOW TO USE:
 - Scrape a single URL at /admin/config/neon/scrape
     * URL - Enter the URL that you want to scrape.
     * NESTED DIV DEPTH - enter a numeral 1 or 2 or whatever to scrape everything
-       inside of this nested level.
+       inside of this nested level. 1 = one level down from top, etc.
     * SPECIFIC DIV - enter the name of a div without quotes or <>
-       If you wanted everything inside of <div class ='corps'> just enter corps.
+       If you wanted everything inside of <div class="corps"> just enter corps.
     * GET ALL IMAGES - Retrieves the URLs of all images.
     * GET ALL LINKS - Retrieves the URLs of all links.
     * RETURN ENTIRE PAGE - Retrieves the entire source of the document.
@@ -30,10 +30,10 @@ HOW TO USE:
     * COMMA SEPARATED URL LIST - Input csv string
        like https://site1.com,https://site2.com,https://site3.com
     * SAVE BATCH LIST - Save a batch list without processing it until unchecked.
-    * RUN BATCH - Immidiately process this batch job, save the results as node content.
-    * GET ALL IMAGES - Retrieves the URLs of all images for each site.
-    * GET ALL LINKS - Retrieves the URLs of all links for each site.
-    * RETURN ENTIRE PAGE - Retrieves the entire source of the document for each site.
+    * RUN BATCH - Immediately process this batch job, save the results as node content.
+    * GET ALL IMAGES - Retrieves and saves the URLs of all images for each site.
+    * GET ALL LINKS - Retrieves and saves the URLs of all links for each site.
+    * RETURN ENTIRE PAGE - Retrieves and saves the entire source of the document for each site.
 
 LICENSE
 ---------------    
