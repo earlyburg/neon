@@ -547,8 +547,8 @@ function _neon_installed_instances() {
 function neon_node_type_insert($content_type) {
   if ($content_type->type == 'neon_data') {
 
-    $body_instance = node_add_body_field($content_type, t('Neon'));
-    field_update_instance($body_instance);
+#    $body_instance = node_add_body_field($content_type, t('Neon'));
+#    field_update_instance($body_instance);
 
     // Create fields.
     foreach (_neon_installed_fields() as $field) {
