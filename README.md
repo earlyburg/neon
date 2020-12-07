@@ -17,9 +17,9 @@ HOW TO USE:
 - Scrape a single URL at /admin/config/neon/scrape
     * URL - Enter the URL that you want to scrape.
     * NESTED DIV DEPTH - enter a numeral 1 or 2 or whatever to scrape everything
-      inside of this nested level.
+       inside of this nested level.
     * SPECIFIC DIV - enter the name of a div without quotes or <>
-      If you wanted everything inside of <div class ='corps'> just enter corps.
+       If you wanted everything inside of <div class ='corps'> just enter corps.
     * GET ALL IMAGES - Retrieves the URLs of all images.
     * GET ALL LINKS - Retrieves the URLs of all links.
     * RETURN ENTIRE PAGE - Retrieves the entire source of the document.
@@ -28,7 +28,7 @@ HOW TO USE:
 
 - Scrape a comma separated list of URLs at /admin/config/neon/url_batch
     * COMMA SEPARATED URL LIST - Input csv string
-      like https://site1.com,https://site2.com,https://site3.com
+       like https://site1.com,https://site2.com,https://site3.com
     * SAVE BATCH LIST - Save a batch list without processing it until unchecked.
     * RUN BATCH - Immidiately process this batch job, save the results as node content.
     * GET ALL IMAGES - Retrieves the URLs of all images for each site.
@@ -47,5 +47,9 @@ CURRENT MAINTAINERS
 
 CREDITS   
 ---------------
+- This module uses the Simple HTML DOM Parser Library
+  * Website: http://sourceforge.net/projects/simplehtmldom/
+- Authors: S.C. Chen, John Schlick, Rus Carroll, logmanoriginal
+
 - [earlyburg](https://github.com/earlyburg).
 
