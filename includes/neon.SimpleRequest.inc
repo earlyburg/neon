@@ -37,7 +37,7 @@ class NeonSimpleRequest {
       $headers = $this->response->headers;
       return $headers;
     } else {
-      return $headers;
+      return FALSE;
     }
   }
 

@@ -161,6 +161,7 @@ function neon_URL_scrape_form($form, &$form_state) {
   $config = config('neon.batch.settings');
   $NeonBatch = new NeonBatch();
 
+  $form['#config'] = 'neon.batch.settings';
   $form['neon_URL_scrape']['url_list'] = array(
     '#type' => 'textarea',
     '#title' => t('Comma separated URL list'),
