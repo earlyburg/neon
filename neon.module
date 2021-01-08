@@ -1,6 +1,7 @@
 <?php
 
 include 'lib/simple_html_dom.php';
+
 /**
  * Implements hook_config_info().
  */
@@ -43,6 +44,7 @@ function neon_menu() {
       'access administration pages'
     ),
     'type' => MENU_NORMAL_ITEM,
+    'file' => 'forms/scrapeForm.inc',
   );
 
   $items['admin/config/neon/url_batch'] = array(
@@ -53,7 +55,33 @@ function neon_menu() {
       'access administration pages'
     ),
     'type' => MENU_NORMAL_ITEM,
+    'file' => 'forms/batchScrapeForm.inc',
   );
+
+  $items['admin/config/neon/ip_list'] = array(
+    'title' => 'Site visitor IPs',
+    'description' => 'Visitor IP Addresses',
+    'page callback' => 'neon_IP_scrape',
+    'access arguments' => array(
+      'access administration pages'
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'forms/ipForm.inc',
+  );
+
+  $items['admin/config/neon/ip_list/%'] = array(
+    'title' => 'WhoIs Lookup',
+    'description' => 'Whois Registrar Lookup',
+    'page callback' => 'whoisLook',
+    'page arguments' => array(4),
+    'access arguments' => array(
+      'access administration pages'
+    ),
+    'type' => MENU_CALLBACK,
+    'access callback' => TRUE,
+    'file' => 'forms/ipForm.inc',
+  );
+
   return $items;
 }
 
@@ -105,8 +133,10 @@ function neon_admin() {
 
   $form['text'] = array(
     '#markup' => '<a href="/admin/config/neon/scrape" target="_new">Scrape a URL</a><br>
-                  <a href="/admin/config/neon/url_batch" target="_new">Scrape a list of URLs</a>'
+                  <a href="/admin/config/neon/url_batch" target="_new">Scrape a list of URLs</a><br>
+                  <a href="/admin/config/neon/ip_list" target="_new">Visitors IP Information</a>'
   );
+
   return system_settings_form($form);
 }
 
@@ -132,320 +162,6 @@ function neon_admin_validate($form, &$form_state) {
       ->set('htpasswd_uname', 'Someuser')
       ->set('htpasswd_pword', 'Somepass')
       ->save();
-  }
-}
-
-/**
- * page callback
- */
-function neon_scrape() {
-  $scrapeform = backdrop_get_form('neon_scrape_form');
-  $ret = backdrop_render($scrapeform);
-  return $ret;
-}
-
-/**
- * page callback
- */
-function neon_URL_scrape() {
-  $scrapeform = backdrop_get_form('neon_URL_scrape_form');
-  $ret = backdrop_render($scrapeform);
-  return $ret;
-}
-
-/**
- * Implements hook_form().
- */
-function neon_URL_scrape_form($form, &$form_state) {
-  $form = array();
-  $config = config('neon.batch.settings');
-  $NeonBatch = new NeonBatch();
-
-  $form['#config'] = 'neon.batch.settings';
-  $form['neon_URL_scrape']['url_list'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Comma separated URL list'),
-    '#default_value' => $NeonBatch->fetch(),
-    '#size' => 60,
-    '#required' => FALSE,
-  );
-
-  $form['neon_URL_scrape']['list_save'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Save Batch List.'),
-    '#description' => t('Save a batch list without processing it.'),
-    '#default_value' => $config->get('scrp_save'),
-  );
-
-  $form['neon_URL_scrape']['run_batch'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Run batch.'),
-    '#description' => t('Immidiately process this batch job, save the results as node content.'),
-    '#default_value' => $config->get('batch_run'),
-  );
-
-  $form['neon_URL_scrape']['images'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Get all images.'),
-    '#default_value' => $config->get('scrp_imgs'),
-  );
-
-  $form['neon_URL_scrape']['links'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Get all links.'),
-    '#default_value' => $config->get('scrp_lnks'),
-  );
-
-  $form['neon_URL_scrape']['full'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Return entire page.'),
-    '#default_value' => $config->get('scrp_page'),
-  );
-
-  $form['neon_URL_scrape']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save'),
-  );
-
-  return $form;
-}
-
-/**
- * Impliments hook_form_validate().
- */
-function neon_URL_scrape_form_validate($form, &$form_state) {
-
-  $formValues = $form_state['values'];
-  $config = config('neon.batch.settings');
-
-  if ( $formValues['list_save'] == 1) {
-    $config->set('scrp_save', 1);
-  } else {
-    $config->set('scrp_save', 0);
-  }
-
-  if ( $formValues['run_batch'] == 1) {
-    $config->set('batch_run', 1);
-  } else {
-    $config->set('batch_run', 0);
-  }
-
-  if ( $formValues['images'] == 1) {
-    $config->set('scrp_imgs', 1);
-  } else {
-    $config->set('scrp_imgs', 0);
-  }
-
-  if ( $formValues['links'] == 1) {
-    $config->set('scrp_lnks', 1);
-  } else {
-    $config->set('scrp_lnks', 0);
-  }
-
-  if ( $formValues['full'] == 1) {
-    $config->set('scrp_page', 1);
-  } else {
-    $config->set('scrp_page', 0);
-  }
-
-  $config->save();
-}
-
-/**
- * Impliments hook_form_submit().
- */
-function neon_URL_scrape_form_submit($form, &$form_state) {
-
-  $formValues = $form_state['values'];
-  $NeonBatch = new NeonBatch();
-
-  if ($formValues['list_save'] == 1) {
-    if($NeonBatch->check()) {
-      $NeonBatch->update($formValues['url_list']);
-    } else {
-      $NeonBatch->create();
-      $NeonBatch->update($formValues['url_list']);
-    }
-
-    if ($formValues['run_batch'] == 1) {
-    neon_process_batch();
-    config_set('neon.batch.settings', 'batch_run', 0);
-    }
-  }
-  else {
-    $NeonBatch->delete();
-  }
-}
-
-/**
- * Implements hook_form().
- */
-function neon_scrape_form($form, &$form_state) {
-
-  $config = config('neon.settings');
-  $form = array();
-  $form['neon_scrape']['url'] = array(
-    '#type' => 'textfield',
-    '#title' => t('URL'),
-    '#default_value' => $config->get('scrp_url'),
-    '#size' => 60,
-    '#maxlength' => 128,
-    '#required' => FALSE,
-  );
-
-  $form['neon_scrape']['depth'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Nested Div Depth'),
-    '#default_value' => $config->get('scrp_depth'),
-    '#size' => 6,
-    '#maxlength' => 16,
-    '#required' => FALSE,
-  );
-
-  $form['neon_scrape']['specific_div'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Specific Div'),
-    '#default_value' => $config->get('scrp_spec_div'),
-    '#size' => 20,
-    '#maxlength' => 16,
-    '#required' => FALSE,
-  );
-
-  $form['neon_scrape']['images'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Get all images.'),
-    '#default_value' => $config->get('scrp_imgs'),
-  );
-
-  $form['neon_scrape']['links'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Get all links.'),
-    '#default_value' => $config->get('scrp_lnks'),
-  );
-
-  $form['neon_scrape']['full'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Return entire page.'),
-    '#default_value' => $config->get('scrp_page'),
-  );
-
-  $form['neon_scrape']['csv'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Show links as CSV list.'),
-    '#default_value' => $config->get('csv'),
-  );
-
-  $form['neon_scrape']['savenode'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Save this data.'),
-    '#default_value' => $config->get('save_node'),
-  );
-
-  $form['neon_scrape']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Submit'),
-  );
-
-  return $form;
-}
-
-/**
- * Implements hook_form_validate();
- */
-function neon_scrape_form_validate($form, &$form_state) {
-
-  $formValues = $form_state['values'];
-  $config = config('neon.settings');
-
-  if ( !empty($formValues['url']) ) {
-    $url = $formValues['url'];
-    $config->set('scrp_url', $url);
-  } else {
-    $config->set('scrp_url', "");
-  }
-
-  if ( !empty($formValues['depth']) ) {
-    $depth = $formValues['depth'];
-    $config->set('scrp_depth', $depth);
-  } else {
-    $config->set('scrp_depth', "");
-  }
-
-  if ( !empty($formValues['specific_div']) ) {
-    $div = $formValues['specific_div'];
-    $config->set('scrp_spec_div', $div);
-  } else {
-    $config->set('scrp_spec_div', "");
-  }
-
-  if ( $formValues['images'] == 1) {
-    $config->set('scrp_imgs', 1);
-  } else {
-    $config->set('scrp_imgs', 0);
-  }
-
-  if ( $formValues['links'] == 1) {
-    $config->set('scrp_lnks', 1);
-  } else {
-    $config->set('scrp_lnks', 0);
-  }
-
-  if ( $formValues['full'] == 1) {
-    $config->set('scrp_page', 1);
-  } else {
-    $config->set('scrp_page', 0);
-  }
-
-  if ( $formValues['csv'] == 1) {
-    $config->set('csv', 1);
-  } else {
-    $config->set('csv', 0);
-  }
-
-  if ( $formValues['savenode'] == 1) {
-    $config->set('save_node', 1);
-  } else {
-    $config->set('save_node', 0);
-  }
-  $config->save();
-}
-
-/**
- * Implements hook_form_submit().
- */
-function neon_scrape_form_submit($form, &$form_state) {
-
-  $formValues = $form_state['values'];
-  $return = neon_scrape_content($formValues);
-  # save the content
-  if ($formValues['savenode'] == 1) {
-    $siteName = parse_url($formValues['url'], PHP_URL_HOST);
-    $nid = neon_node_create($siteName, $return);
-  }
-  foreach ( $return as $element => $value) {
-
-    switch ($element) {
-        case ( 'full' ):
-            dpm(array($value));
-            break;
-        case ( 'links' ):
-            dpm($value);
-            break;
-        case ( 'images' ):
-            dpm($value);
-            break;
-        case ( 'specific_div' ):
-            dpm($value);
-            break;
-        case ( 'depth' ):
-            dpm($value);
-            break;
-        case ( 'csv' ):
-            dpm(array($value));
-            break;
-        default:
-            dpm($value);
-    }
   }
 }
 
@@ -717,7 +433,7 @@ function neon_node_create( $title, $params = array() ) {
     $node->type = 'neon_data';
     $node->title = $title;
     node_object_prepare($node);
-    $node->language = LANGUAGE_NONE;
+    $node->langcode = LANGUAGE_NONE;
     $node->uid = 1;
     $node->status = 1;
     $node->promote = 0;
@@ -729,25 +445,25 @@ function neon_node_create( $title, $params = array() ) {
 
     if ( isset($params['links']) ) {
       foreach ($params['links'] as $value) {
-       $node->neon_links[$node->language][]['value'] = $value;
+       $node->neon_links[$node->langcode][]['value'] = $value;
       }
     }
 
     if ( isset($params['images']) ) {
       foreach ($params['images'] as $value) {
-        $node->neon_image_links[$node->language][]['value'] = $value;
+        $node->neon_image_links[$node->langcode][]['value'] = $value;
       }
     }
 
     if ( isset($params['specific_div']) ) {
       foreach ($params['specific_div'] as $value) {
-        $node->neon_divs_one[$node->language][]['value'] = $value;
+        $node->neon_divs_one[$node->langcode][]['value'] = $value;
       }
     }
 
     if ( isset($params['depth']) ) {
       foreach ($params['depth'] as $value) {
-        $node->neon_divs_two[$node->language][]['value'] = $value;
+        $node->neon_divs_two[$node->langcode][]['value'] = $value;
       }
     }
 
@@ -767,5 +483,7 @@ function neon_autoload_info() {
   return array(
     'NeonSimpleRequest' => 'includes/neon.SimpleRequest.inc',
     'NeonBatch' => 'includes/neon.Batch.inc',
+    'Whois' => 'includes/src/whois.main.php',
+    'utils' => 'includes/src/whois.utils.php',
   );
 }

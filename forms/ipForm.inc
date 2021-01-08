@@ -1,0 +1,97 @@
+<?php
+
+/**
+ * page callback
+ */
+function neon_IP_scrape() {
+  $rows = [];
+  $ret = '';
+  $header = array(
+    array('data' => t('IP')),
+    array('data' => t('Host')),
+    array('data' => t('Date')),
+    array('data' => t('Domain')),
+  );
+
+  $ipQuery = db_select('visitors', 'n')
+    ->extend('PagerDefault')
+    ->extend('TableSort')
+    ->distinct(TRUE)
+    ->fields('n', array('visitors_ip'))
+    ->limit(10);
+  $results = $ipQuery->execute();
+
+  foreach ($results as $data) {
+    if ( long2ip($data->visitors_ip) ) {
+      $ipAddress = long2ip($data->visitors_ip);
+      if ( gethostbyaddr($ipAddress) ) {
+        $hostName = gethostbyaddr($ipAddress);
+        if ($hostName != $ipAddress) {
+          $rootDomain = get_domain($hostName);
+        }
+      }
+      else {
+        $hostName = 'Unknown Hostname';
+      }
+    }
+    else {
+      $ipAddress = 'Could not decode IP string';
+    }
+    $rows[] = array(
+      $ipAddress,
+      $hostName,
+      date("F j, Y, g:i a", getLastTimestamp($data->visitors_ip)),
+      '<a class="colorbox-load" href="ip_list/'.$rootDomain.'?width=550&height=600">' . $rootDomain . '</a>'
+    );
+  }
+  $ret = '<div class="submitted">There are ' . getIpNum() . ' unique IP addresses in the database.</div>';
+  $ret .= theme('table', array('header' => $header, 'rows' => $rows));
+  $ret .= theme('pager');
+  return $ret;
+}
+
+// @TODO blacklist IPs get redirected to a pre-set url
+
+function get_domain($host) {
+  $myhost = strtolower(trim($host));
+  $count = substr_count($myhost, '.');
+  if($count === 2){
+    if(strlen(explode('.', $myhost)[1]) > 3) $myhost = explode('.', $myhost, 2)[1];
+  } else if($count > 2){
+    $myhost = get_domain(explode('.', $myhost, 2)[1]);
+  }
+  return $myhost;
+}
+
+
+function getLastTimestamp($ip = NULL) {
+  $timeStamp = db_select('visitors', 'n')
+    ->fields('n', array('visitors_date_time'))
+    ->having("MAX(visitors_date_time)")
+    ->condition('n.visitors_ip',$ip, '=')
+    ->execute()
+    ->fetchField();
+  return $timeStamp;
+}
+
+
+function getIpNum() {
+  $ipCount = db_select('visitors', 'n')
+    ->fields('n', array('visitors_ip'))
+    ->distinct(TRUE)
+    ->execute()
+    ->rowCount();
+  return $ipCount;
+}
+
+
+function whoisLook($query) {
+  $whois = new Whois();
+  $result = $whois->Lookup($query,false);
+  $content = '<h3>' . $query . '</h3>';
+  foreach ($result['rawdata'] as $line) {
+    $content .= '<div class="field-items">' . $line . '</div>';
+  }
+  return $content;
+}
+
