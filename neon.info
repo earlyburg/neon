@@ -3,6 +3,7 @@ name = Neon
 description = Tools to gather data on the web.
 dependencies[] = visitors
 dependencies[] = colorbox
+dependencies[] = devel
 package = Other
 configure = admin/config/neon
 backdrop = 1.x
