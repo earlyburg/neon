@@ -50,8 +50,10 @@ function neon_IP_scrape() {
   return $ret;
 }
 
-// @TODO blacklist IPs get redirected to a pre-set url
-
+/**
+ * @return String
+ * the root domain of a FQDN with subdomains
+ */
 function get_domain($host) {
   $myhost = strtolower(trim($host));
   $count = substr_count($myhost, '.');
@@ -63,7 +65,10 @@ function get_domain($host) {
   return $myhost;
 }
 
-
+/**
+ * @return String
+ * the timestamp of the most recent hit from any IP
+ */
 function getLastTimestamp($ip = NULL) {
   $timeStamp = db_select('visitors', 'n')
     ->fields('n', array('visitors_date_time'))
@@ -74,7 +79,10 @@ function getLastTimestamp($ip = NULL) {
   return $timeStamp;
 }
 
-
+/**
+ * @return String
+ * the number of unique IPs in the visitors table
+ */
 function getIpNum() {
   $ipCount = db_select('visitors', 'n')
     ->fields('n', array('visitors_ip'))
@@ -84,7 +92,10 @@ function getIpNum() {
   return $ipCount;
 }
 
-
+/**
+ * @return String
+ * contains whois info and associated data about a domain name
+ */
 function whoisLook($query) {
   $whois = new Whois();
   $result = $whois->Lookup($query,false);
@@ -94,4 +105,4 @@ function whoisLook($query) {
   }
   return $content;
 }
-
+// @TODO blacklist IPs get redirected to a pre-set url
