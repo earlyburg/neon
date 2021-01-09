@@ -72,7 +72,7 @@ function neon_menu() {
   $items['admin/config/neon/ip_list/%'] = array(
     'title' => 'WhoIs Lookup',
     'description' => 'Whois Registrar Lookup',
-    'page callback' => 'whoisLook',
+    'page callback' => 'neon_whoisLook',
     'page arguments' => array(4),
     'access arguments' => array(
       'access administration pages'
@@ -83,9 +83,9 @@ function neon_menu() {
   );
 
   $items['admin/config/neon/geocode/%'] = array(
-    'title' => 'GeoCode Lookup',
-    'description' => 'GeoCode location Lookup',
-    'page callback' => 'geoLook',
+    'title' => 'GeoCode IP Lookup',
+    'description' => 'GeoCode IP location lookup',
+    'page callback' => 'neon_geoLook',
     'page arguments' => array(4),
     'access arguments' => array(
       'access administration pages'

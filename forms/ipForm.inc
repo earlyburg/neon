@@ -27,7 +27,7 @@ function neon_IP_scrape() {
       if ( gethostbyaddr($ipAddress) ) {
         $hostName = gethostbyaddr($ipAddress);
         if ($hostName != $ipAddress) {
-          $rootDomain = get_domain($hostName);
+          $rootDomain = neon_getDomain($hostName);
         }
       }
       else {
@@ -40,11 +40,11 @@ function neon_IP_scrape() {
     $rows[] = array(
       '<a class="colorbox-load" href="geocode/'.$ipAddress.'?width=550&height=600">' . $ipAddress . '</a>',
       $hostName,
-      date("F j, Y, g:i a", getLastTimestamp($data->visitors_ip)),
+      date("F j, Y, g:i a", neon_getLastTimestamp($data->visitors_ip)),
       '<a class="colorbox-load" href="ip_list/'.$rootDomain.'?width=550&height=600">' . $rootDomain . '</a>'
     );
   }
-  $ret = '<div class="submitted">There are ' . getIpNum() . ' unique IP addresses in the database.</div>';
+  $ret = '<div class="submitted">There are ' . neon_getIpNum() . ' unique IP addresses in the database.</div>';
   $ret .= theme('table', array('header' => $header, 'rows' => $rows));
   $ret .= theme('pager');
   return $ret;
@@ -54,13 +54,13 @@ function neon_IP_scrape() {
  * @return String
  * the root domain of a FQDN with subdomains
  */
-function get_domain($host) {
+function neon_getDomain($host) {
   $myhost = strtolower(trim($host));
   $count = substr_count($myhost, '.');
   if($count === 2){
     if(strlen(explode('.', $myhost)[1]) > 3) $myhost = explode('.', $myhost, 2)[1];
   } else if($count > 2){
-    $myhost = get_domain(explode('.', $myhost, 2)[1]);
+    $myhost = neon_getDomain(explode('.', $myhost, 2)[1]);
   }
   return $myhost;
 }
@@ -69,7 +69,7 @@ function get_domain($host) {
  * @return String
  * the timestamp of the most recent hit from any IP
  */
-function getLastTimestamp($ip = NULL) {
+function neon_getLastTimestamp($ip = NULL) {
   $timeStamp = db_select('visitors', 'n')
     ->fields('n', array('visitors_date_time'))
     ->having("MAX(visitors_date_time)")
@@ -83,7 +83,7 @@ function getLastTimestamp($ip = NULL) {
  * @return String
  * the number of unique IPs in the visitors table
  */
-function getIpNum() {
+function neon_getIpNum() {
   $ipCount = db_select('visitors', 'n')
     ->fields('n', array('visitors_ip'))
     ->distinct(TRUE)
@@ -96,7 +96,7 @@ function getIpNum() {
  * @return String
  * contains whois info and associated data about a domain name
  */
-function whoisLook($query) {
+function neon_whoisLook($query) {
   $whois = new Whois();
   $result = $whois->Lookup($query,false);
   $content = '<h3>' . $query . '</h3>';
@@ -110,7 +110,7 @@ function whoisLook($query) {
  * @return String
  * contains geographic information about an IP address
  */
-function geoLook($query) {
+function neon_geoLook($query) {
   $ipLocate = 'https://www.iplocate.io/api/lookup/';
   $ret = file_get_contents($ipLocate . $query);
   $return = backdrop_json_decode($ret);
