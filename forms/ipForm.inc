@@ -38,7 +38,7 @@ function neon_IP_scrape() {
       $ipAddress = 'Could not decode IP string';
     }
     $rows[] = array(
-      $ipAddress,
+      '<a class="colorbox-load" href="geocode/'.$ipAddress.'?width=550&height=600">' . $ipAddress . '</a>',
       $hostName,
       date("F j, Y, g:i a", getLastTimestamp($data->visitors_ip)),
       '<a class="colorbox-load" href="ip_list/'.$rootDomain.'?width=550&height=600">' . $rootDomain . '</a>'
@@ -73,7 +73,7 @@ function getLastTimestamp($ip = NULL) {
   $timeStamp = db_select('visitors', 'n')
     ->fields('n', array('visitors_date_time'))
     ->having("MAX(visitors_date_time)")
-    ->condition('n.visitors_ip',$ip, '=')
+    ->condition('n.visitors_ip', $ip, '=')
     ->execute()
     ->fetchField();
   return $timeStamp;
@@ -105,4 +105,22 @@ function whoisLook($query) {
   }
   return $content;
 }
+
+/**
+ * @return String
+ * contains geographic information about an IP address
+ */
+function geoLook($query) {
+  $ipLocate = 'https://www.iplocate.io/api/lookup/';
+  $ret = file_get_contents($ipLocate . $query);
+  $return = backdrop_json_decode($ret);
+  $content='';
+  foreach ($return as $index => $line) {
+    $content .= '<div class="field-items"><b>' . $index .'</b>: '. $line . '</div>';
+  }
+  return $content;
+}
+
+
+
 // @TODO blacklist IPs get redirected to a pre-set url

@@ -82,6 +82,19 @@ function neon_menu() {
     'file' => 'forms/ipForm.inc',
   );
 
+  $items['admin/config/neon/geocode/%'] = array(
+    'title' => 'GeoCode Lookup',
+    'description' => 'GeoCode location Lookup',
+    'page callback' => 'geoLook',
+    'page arguments' => array(4),
+    'access arguments' => array(
+      'access administration pages'
+    ),
+    'type' => MENU_CALLBACK,
+    'access callback' => TRUE,
+    'file' => 'forms/ipForm.inc',
+  );
+
   return $items;
 }
 
