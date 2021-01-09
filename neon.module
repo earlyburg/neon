@@ -356,6 +356,8 @@ function neon_scrape_content($formValues = array() ) {
         // string
         $returnArray['csv'] = neon_create_csv($returnArray['links']);
       }
+      $html->clear();
+      unset($html);
     }
     else {
       $responseCode = $responseOb->response->code;
