@@ -27,6 +27,18 @@ class NeonSimpleRequest {
   }
 
 
+  function status_message() {
+    ( isset($this->response->status_message) ) ? $return = $this->response->status_message : $return = 'No status message';
+    return $return;
+  }
+
+
+  function error() {
+    ( isset($this->response->error) ) ? $return = $this->response->error : $return = FALSE;
+    return $return;
+  }
+
+
   function okReturn200() {
     ($this->response->code == '200') ? $return = TRUE : $return = FALSE;
     return $return;

@@ -360,10 +360,8 @@ function neon_scrape_content($formValues = array() ) {
       unset($html);
     }
     else {
-      $responseCode = $responseOb->response->code;
-      $responseMessage = $responseOb->status_message;
-      $returnArray['message'] = 'The request for '. $url .' returned a response code of ' . $responseCode .' - '. $responseMessage;
-      watchdog('neon', 'The request for '. $url .' returned a response code of ' . $responseCode, array(), WATCHDOG_NOTICE);
+      $returnArray['message'] = 'The request for '. $url .' returned a response code of ' . $responseOb->response->code .' - '. $responseOb->status_message();
+      watchdog('neon', 'The request for '. $url .' returned a response code of ' . $responseOb->response->code, array(), WATCHDOG_NOTICE);
     }
   }
   return $returnArray;
@@ -420,8 +418,7 @@ function neon_process_batch() {
         unset($html);
       }
       else {
-        $responseCode = $responseOb->response->code;
-        watchdog('neon', 'The request for '. $url .' returned a response code of ' . $responseCode, array(), WATCHDOG_NOTICE);
+        watchdog('neon', 'The request for '. $url .' returned a response code of ' . $responseOb->response->code, array(), WATCHDOG_NOTICE);
       }
     }
   }
