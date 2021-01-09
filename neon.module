@@ -415,10 +415,12 @@ function neon_process_batch() {
         $siteName = parse_url($url, PHP_URL_HOST);
         $nid = neon_node_create($siteName, $returnArray);
         watchdog('neon', 'Neon batch created a node with id ' . $nid, array(), WATCHDOG_INFO);
+        $html->clear();
+        unset($html);
       }
       else {
         $responseCode = $responseOb->response->code;
-        watchdog('neon', 'The request returned a response code of ' . $responseCode, array(), WATCHDOG_NOTICE);
+        watchdog('neon', 'The request for '. $url .' returned a response code of ' . $responseCode, array(), WATCHDOG_NOTICE);
       }
     }
   }
