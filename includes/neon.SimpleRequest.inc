@@ -1,19 +1,24 @@
 <?php
-
+// @TODO test for webserver types so we use the correct hash encoding
 class NeonSimpleRequest {
 
   function __construct( $url, $options ) {
-    # if the site is htpasswd protected, add the auth header to the request
-// @TODO test for webserver types so we use the correct hash encoding
-    $conf1 = config_get('neon.settings', 'htpasswd');
-    $raw_u = config_get('neon.settings', 'htpasswd_uname');
-    $raw_p = config_get('neon.settings', 'htpasswd_pword');
+    /* if the site is htpasswd protected, add the auth header to the request */
+    $config = config('neon.settings');
+    $conf1 = $config->get('htpasswd');
+    $raw_u = $config->get('htpasswd_uname');
+    $raw_p = $config->get('htpasswd_pword');
     $this->hash = base64_encode($raw_u . ":" . $raw_p);
-    if ($conf1 === 1) {
+    if ($conf1 == 1) {
       $string = "Basic " . $this->hash;
       $options['headers'] += ['Authorization' => $string];
     }
-    $this->response = backdrop_http_request(url($url, array('absolute' => TRUE)), $options);
+    try {
+      $this->response = backdrop_http_request(url($url, array('absolute' => TRUE)), $options);
+    }
+    catch (exception $e) {
+      watchdog('neon', 'The request returned an error code of ' . $e, array(), WATCHDOG_NOTICE);
+    }
   }
 
 
