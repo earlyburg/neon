@@ -17,7 +17,7 @@ class NeonSimpleRequest {
       $this->response = backdrop_http_request(url($url, array('absolute' => TRUE)), $options);
     }
     catch (exception $e) {
-      watchdog('neon', 'The request returned an error code of ' . $e, array(), WATCHDOG_NOTICE);
+      watchdog('neon', 'The request returned an error response of ' . $e, array(), WATCHDOG_NOTICE);
     }
   }
 
@@ -28,22 +28,13 @@ class NeonSimpleRequest {
 
 
   function okReturn200() {
-    if ($this->response->code == '200') {
-      return TRUE;
-    } else {
-      return FALSE;
-    }
+    ($this->response->code == '200') ? $return = TRUE : $return = FALSE;
+    return $return;
   }
 
 
   function fetchResponseHeaders() {
-    $headers = array();
-    if ($this->response->code == '200') {
-      $headers = $this->response->headers;
-      return $headers;
-    } else {
-      return FALSE;
-    }
+    return $this->response->headers;
   }
 
 
@@ -60,9 +51,8 @@ class NeonSimpleRequest {
     if ($this->response->code == '200') {
       return $this->response->data;
     } else {
-      $responseCode = $this->response->code;
-      watchdog('neon', 'The request returned a response code of ' . $responseCode, array(), WATCHDOG_NOTICE);
-      return "The request returned a response code of " . $responseCode;
+      watchdog('neon', 'The request returned a response code of ' . $this->response->code, array(), WATCHDOG_NOTICE);
+      return 'The request returned a response code of ' . $this->response->code .' - '. $this->response->status_message;
     }
   }
 }

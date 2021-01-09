@@ -361,7 +361,8 @@ function neon_scrape_content($formValues = array() ) {
     }
     else {
       $responseCode = $responseOb->response->code;
-      $returnArray['message'] = 'The request for '. $url .' returned a response code of ' . $responseCode;
+      $responseMessage = $responseOb->status_message;
+      $returnArray['message'] = 'The request for '. $url .' returned a response code of ' . $responseCode .' - '. $responseMessage;
       watchdog('neon', 'The request for '. $url .' returned a response code of ' . $responseCode, array(), WATCHDOG_NOTICE);
     }
   }
